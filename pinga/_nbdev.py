@@ -2,9 +2,18 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {}
+index = {"expand_hyphen": "notation.ipynb",
+         "del_dot": "notation.ipynb",
+         "del_zero": "notation.ipynb",
+         "get_unique": "notation.ipynb",
+         "expand_star": "notation.ipynb",
+         "expand_colon": "notation.ipynb",
+         "expand_regex": "notation.ipynb",
+         "expand_code": "notation.ipynb",
+         "get_rows": "notation.ipynb"}
 
-modules = ["None.py"]
+modules = ["charlson.py",
+           "notation.py"]
 
 doc_url = "https://hmelberg.github.io/pinga/"
 
