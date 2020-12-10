@@ -2,7 +2,8 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"expand_hyphen": "notation.ipynb",
+index = {"nothing_here": "00_core.ipynb",
+         "expand_hyphen": "notation.ipynb",
          "del_dot": "notation.ipynb",
          "del_zero": "notation.ipynb",
          "get_unique": "notation.ipynb",
@@ -10,10 +11,12 @@ index = {"expand_hyphen": "notation.ipynb",
          "expand_colon": "notation.ipynb",
          "expand_regex": "notation.ipynb",
          "expand_code": "notation.ipynb",
-         "get_rows": "notation.ipynb"}
+         "get_rows": "query.ipynb"}
 
-modules = ["charlson.py",
-           "notation.py"]
+modules = ["core.py",
+           "charlson.py",
+           "notation.py",
+           "query.py"]
 
 doc_url = "https://hmelberg.github.io/pinga/"
 
