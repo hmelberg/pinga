@@ -4,7 +4,7 @@ __all__ = ['get_rows']
 
 # Cell
 # mark rows that contain certain codes in one or more colums
-def get_rows(df, codes, cols=None, sep=None, pid='pid'):
+def get_rows(df, codes, cols=None, sep=None, pid='pid', expand=False, codebook=None):
   """
   Make a boolean series that is true for all rows that contain the codes
 
@@ -12,7 +12,7 @@ def get_rows(df, codes, cols=None, sep=None, pid='pid'):
     df (dataframe or series): The dataframe with codes
     codes (str, list, set, dict): codes to be counted
     cols (str or list): list of columns to search in
-    sep (str): The symbol that seperates the codes if there are multiple codes in a cell
+    sep (str): The symbol that separates the codes if there are multiple codes in a cell
     pid (str): The name of the column with the personal identifier
 
   """
@@ -26,6 +26,33 @@ def get_rows(df, codes, cols=None, sep=None, pid='pid'):
   # must be a list sine we may loop over it
   if not isinstance(cols, list):
     cols = [cols]
+
+  if any(notation in ''.join(cols) for notation in '*-:']):
+      cols=expand_cols(cols)
+
+  # special case: star notation that does not require expansion
+
+  if expand:
+     # start with special case. for speed:  star notation that does not require expansion
+     # (does not require making a list of unique values)
+     if any(code.endswith('*') for code in codes):
+       star_codes=[code for code in codes if code.endswith('*')]
+       codes=[code for codes if code not in star_codes]
+
+       #if codes have both star and hyphen notation
+       star_codes=expand_hyphen(star_codes)
+
+       #get the rows!
+       endstar_rows=_get_rows_endstar(df=df, codes=codes, cols=cols, codebook=codebook)
+
+       # return rows right away if there are no other codes to be checked
+       if len(codes)==0:
+         return endstar_rows
+
+    # continue with all other codes
+    # check if any codes need expansion
+    if any(notation in ''.join(codes) for notation in '*-:']):
+      codes=expand_codes(codes)
 
   # approach depends on whether we have multi-value cells or not
   # if sep exist, then have multi-value cells
@@ -46,4 +73,28 @@ def get_rows(df, codes, cols=None, sep=None, pid='pid'):
   else:
     mask = df[cols].isin(codes)
     rows = mask.any(axis=1)
+
+  if 'endstar_rows' in locals():
+    rows=rows | endstar_rows
+
   return rows
+
+# Internal Cell
+  def _get_rows_endstar(df, codes, cols):
+    """
+    Returns rows with codes that starts with a given value(s) in one or 
+    more columns, with one or more values in each column
+
+    Note: special function for the special (but common) case when the user 
+    wants to pick codes that start with a given string
+    """
+    for col in cols:
+      if sep:
+        for code in codes:
+          code=code.strip('*')
+          codes_regex=codes_regex + rf'|\b{code}\w+'
+          #double check, potential problem, hyphen a word boundary in regex. Use b vs w+?       
+          rows = rows | df[col].str.contains(rf'\b{code}\w+', na=False) # single col, multiple cell values
+      else:
+        rows = rows | df[col].str.startswith(code) # single col, single cell value
+    return rows
