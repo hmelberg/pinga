@@ -10,7 +10,7 @@ index = {"nothing_here": "00_core.ipynb",
          "expand_star": "notation.ipynb",
          "expand_colon": "notation.ipynb",
          "expand_regex": "notation.ipynb",
-         "expand": "notation.ipynb",
+         "expand_code": "notation.ipynb",
          "get_rows": "query.ipynb"}
 
 modules = ["core.py",
